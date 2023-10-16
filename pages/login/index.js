@@ -56,7 +56,7 @@ const LoginPage = () => {
       <Drawer isOpen={isDrawerOpen} onClose={handleMenuToggle}></Drawer>
       <h2> You are not signed in!!</h2>
         <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full'
-                onClick={() => signIn()}>
+                onClick={() => signIn('google')}>
           Sign in
         </button>
       <Bottom></Bottom>
