@@ -1,30 +1,59 @@
 'use client'
+import 'tailwindcss/tailwind.css'
 import Appbar from './components/Appbar';
 import Bottom from './components/Bottom';
 import Drawer from './components/Drawer';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { useRouter } from "next/navigation";
+import { searchProducts } from '@/app/utils/api';
 
 export default function Home() {
-  const [isDrawerOpen, setIsDrawerOpen] = useState();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const router = useRouter();
 
   const handleMenuToggle  = () => {
     setIsDrawerOpen(!isDrawerOpen)
   }
 
+  useEffect(() => {
+    const search = async () => {
+      const results = await searchProducts(searchTerm);
+      setSearchResults(results);
+    };
+
+    search();
+  }, [searchTerm]);
+
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-bg-image bg-cover bg-fixed">
       <Appbar onMenuToggle={handleMenuToggle}></Appbar>
       <Drawer isOpen={isDrawerOpen} onClose={handleMenuToggle}></Drawer>
-          {/* <button
-            className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full'
-            onClick={() => router.push("/login")}
-          >
-            {" "}
-            Login
-          </button> */}
-      <Bottom></Bottom>
+      <div className="w-full flex justify-center py-8">
+        <input 
+          type='text'
+          placeholder='Buscar produtos'
+          className='bg-gray-200 border border-gray-300 rounded-full p-2 w-80'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      <div>
+        <ul className='flex flex-wrap'>
+            {searchResults.map((product) => (
+              <li key={product.id}>
+                <div className='w-64 h-64 m-4 bg-white p-4 shadow-md'>
+                  <a href={product.id}>
+                    <img src={product.image} className='w-16 h-16 rounded-full'></img>
+                    <p className='mt-2'>{product.title}</p>
+                  </a>  
+                </div>
+
+              </li>
+            ))}
+        </ul>
+      </div>
     </main>
   )
 }

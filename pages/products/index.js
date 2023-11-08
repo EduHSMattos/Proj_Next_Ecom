@@ -1,62 +1,58 @@
-'use client'
-import 'tailwindcss/tailwind.css'
+// pages/products.js
+import React, { useContext, useEffect, useState } from 'react';
+import { fetchProducts } from '@/app/utils/api';
+import { CartContext } from '@/app/contexts/CartContext';
 import Appbar from '@/app/components/Appbar';
 import Bottom from '@/app/components/Bottom';
 import Drawer from '@/app/components/Drawer';
-import React, {useContext, useEffect, useState} from 'react';
-import { useSession, signIn, signOut } from "next-auth/react";
-import { useRouter } from "next/router";
-import { fetchProducts } from '@/app/utils/api'
-import { CartContext } from '@/app/contexts/CartContext';
-import { ProductContainer, ProductImage, CardButton } from '@/app/styles/ProductsStyles'
+import {
+  ProductContainer,
+  ProductImage,
+  ProductTitle,
+  ProductPrice,
+  AddToCartButton,
+} from '@/app/styles/ProductsPage';
+import 'tailwindcss/tailwind.css';
 
 const ProductsPage = () => {
-  const [isDrawerOpen, setIsDrawerOpen] = useState();
-  const {addToCart} = useContext(CartContext);
-
-  const handleMenuToggle  = () => {
-    setIsDrawerOpen(!isDrawerOpen)
-  }
-
-  const { data: session } = useSession();
-  const router = useRouter();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const handleMenuToggle = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
 
   const [products, setProducts] = useState([]);
+  const { addToCart } = useContext(CartContext);
 
   useEffect(() => {
     const getProducts = async () => {
-        const productsData = await fetchProducts();
-        setProducts(productsData);
-    }
+      const productsData = await fetchProducts();
+      setProducts(productsData);
+    };
     getProducts();
   }, []);
 
-  
   return (
-    <main className="min-h-screen">
+    <main className='bg-bg-image bg-cover bg-fixed'>
       <Appbar onMenuToggle={handleMenuToggle}></Appbar>
       <Drawer isOpen={isDrawerOpen} onClose={handleMenuToggle}></Drawer>
-      <ul>
-        {products.map((product) =>(
+      <div>
+        <ul>
+          {products.map((product) => (
             <li key={product.id}>
               <ProductContainer>
-                <ProductImage src={product.image} width={200} />
-                <p>{product.title}</p>
-                <p>{product.price}</p> 
-                <p>{product.description}</p>
-                <p>{product.category} </p>
-                <CardButton 
-                  onClick={() => addToCart(product)}
-                >
-                  Add cart
-                </CardButton>
+                <ProductImage src={product.image} alt={product.title} />
+                <ProductTitle>{product.title}</ProductTitle>
+                <ProductPrice>{product.price}</ProductPrice>
+                <AddToCartButton onClick={() => addToCart(product)}>
+                  Add to Cart
+                </AddToCartButton>
               </ProductContainer>
             </li>
-        ))}
-      </ul>
-      <Bottom></Bottom>
+          ))}
+        </ul>
+      </div>
     </main>
   );
+};
 
-}
 export default ProductsPage;

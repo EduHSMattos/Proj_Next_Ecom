@@ -1,41 +1,52 @@
-import 'tailwindcss/tailwind.css'
-import Appbar from '@/app/components/Appbar';
-import Bottom from '@/app/components/Bottom';
-import Drawer from '@/app/components/Drawer';
-import React, {useContext, useState} from 'react';
-import { CartContext } from '@/app/contexts/CartContext';
-import { ProductContainer, ProductImage, CardButton } from '@/app/styles/ProductsStyles'
+import React, { useContext, useState } from "react";
+import { CartContext } from "@/app/contexts/CartContext";
+import Appbar from "@/app/components/Appbar";
+import Bottom from "@/app/components/Bottom";
+import Drawer from "@/app/components/Drawer";
+import {
+  CartItemContainer,
+  CartItemImage,
+  CartItemTitle,
+  CartItemPrice,
+  RemoveFromCartButton,
+} from "@/app/styles/CartPage";
+import "tailwindcss/tailwind.css";
+import { ThemeContext } from "@/app/contexts/ThemeContext"; // Importando o ThemeProvider
 
 const CartPage = () => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { theme } = useContext(ThemeContext);
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState();
+  const handleMenuToggle = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
   const { cartItems, removeFromCart } = useContext(CartContext);
 
-  const handleMenuToggle  = () => {
-    setIsDrawerOpen(!isDrawerOpen)
-  }
-
   return (
-    <main className="min-h-screen">
+    <div className={`app-container ${theme ? "dark" : "light"}`}>
+      {" "}
+      {/* Aplicando o tema à div principal */}
       <Appbar onMenuToggle={handleMenuToggle}></Appbar>
       <Drawer isOpen={isDrawerOpen} onClose={handleMenuToggle}></Drawer>
-        <ul>
-          {cartItems.map((item) => (
-            <li key={item.id}>
-              <ProductContainer>
-              <ProductImage src={item.image}/>
-                <p>{item.title}</p>
-                <p>Price: {item.price}</p>
-                <p>Quantity: {item.quantity}</p>
-                <CardButton onClick={() => removeFromCart(item.id)}>Remove from Cart</CardButton>
-              </ProductContainer>
-            </li>
-          ))}
-        </ul>
-
+      <ul>
+        {cartItems.map((item) => (
+          <li key={item.id}>
+            <CartItemContainer>
+              <CartItemImage src={item.image} alt={item.title} />
+              <CartItemTitle>{item.title}</CartItemTitle>
+              <CartItemPrice>Price: {item.price}</CartItemPrice>
+              <p>Quantity: {item.quantity}</p>
+              <RemoveFromCartButton onClick={() => removeFromCart(item.id)}>
+                Remove from Cart
+              </RemoveFromCartButton>
+            </CartItemContainer>
+          </li>
+        ))}
+      </ul>
       <Bottom></Bottom>
-    </main>
+    </div>
   );
+};
 
-}
 export default CartPage;
